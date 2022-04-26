@@ -38,12 +38,12 @@ class TweetDfExtractor:
     # an example function
     def find_statuses_count(self) -> list:
         statuses_count = [tweet['user']['statuses_count']
-                          for tweet in self.tweetslist]
+                          for tweet in self.tweets_list]
         return statuses_count
 
     def find_full_text(self) -> list:
 
-        text = [tweet['text'] for tweet in self.tweetslist]
+        text = [tweet['text'] for tweet in self.tweets_list]
         return text
 
     def find_sentiments(self, text) -> list:
@@ -59,36 +59,36 @@ class TweetDfExtractor:
 
     def find_created_time(self) -> list:
 
-        created_at = [tweet['created_at'] for tweet in self.tweetslist]
+        created_at = [tweet['created_at'] for tweet in self.tweets_list]
         return created_at
 
     def find_source(self) -> list:
 
-        source = [tweet['source'] for tweet in self.tweetslist]
+        source = [tweet['source'] for tweet in self.tweets_list]
 
         return source
 
     def find_screen_name(self) -> list:
 
         screen_name = [tweet['user']['screen_name']
-                       for tweet in self.tweetslist]
+                       for tweet in self.tweets_list]
         return screen_name
 
     def find_followers_count(self) -> list:
 
         followers_count = [tweet['user']['followers_count']
-                           for tweet in self.tweetslist]
+                           for tweet in self.tweets_list]
         return followers_count
 
     def find_friends_count(self) -> list:
         friends_count = [tweet['user']['friends_count']
-                         for tweet in self.tweetslist]
+                         for tweet in self.tweets_list]
         return friends_count
 
     def is_sensitive(self) -> list:
         try:
-            is_sensitive = [x['possibly_sensitive'] if x['possibly_sensitive'] in x.keys(
-            ) else None for x in self.tweets_list]
+            is_sensitive = [x['possibly_sensitive']
+                            if 'possibly_sensitive' in x else None for x in self.tweets_list]
         except KeyError:
             is_sensitive = []
 
@@ -96,28 +96,31 @@ class TweetDfExtractor:
 
     def find_favourite_count(self) -> list:
         favourites_count = [tweet['user']['favourites_count']
-                            for tweet in self.tweetslist]
+                            for tweet in self.tweets_list]
         return favourites_count
 
     def find_retweet_count(self) -> list:
-        retweet_count = [tweet['retweet_count'] for tweet in self.tweetslist]
+        retweet_count = [tweet['retweet_count'] for tweet in self.tweets_list]
         return retweet_count
 
     def find_hashtags(self) -> list:
-        hashtags = [tweet['entities']['hashtags'] for tweet in self.tweetslist]
+        # hashtags = [tweet['entities']['hashtags']
+        # for tweet in self.tweets_list]
         # or if only hashtag text is needed
-        # hashtags = []
-        # for tweet in self.tweets_list:
-        #     hashtags.append([hashtag['text'] for hashtag in tweet['entities']['hashtags']])
+        hashtags = []
+        for tweet in self.tweets_list:
+            hashtags.append([hashtag['text']
+                            for hashtag in tweet['entities']['hashtags']])
         return hashtags
 
     def find_mentions(self) -> list:
-        mentions = [tweet['entities']['user_mentions']
-                    for tweet in self.tweetslist]
+        # mentions = [tweet['entities']['user_mentions']
+        # for tweet in self.tweets_list]
         # or if only user mention  screen name or name  is needed
-        # screen_name = []
-        # for tweet in self.tweets_list:
-        #     screen_name.append([user_mentions['screen_name'] for user_mentions in tweet['entities']['user_mentions']])
+        mentions = []
+        for tweet in self.tweets_list:
+            mentions.append([user_mentions['screen_name']
+                             for user_mentions in tweet['entities']['user_mentions']])
         return mentions
 
     def find_location(self) -> list:
