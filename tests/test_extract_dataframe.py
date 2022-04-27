@@ -3,6 +3,8 @@
 # sys.path.append(os.path.abspath(os.path.join('../')))
 # import extract_dataframe
 
+
+
 import os
 import sys
 import pandas as pd
@@ -10,9 +12,8 @@ import unittest
 # from  extract_dataframe import TweetDfExtractor
 # from extract_dataframe import read_json
 sys.path.append(os.path.abspath(os.path.join('../Twitter-Data-Analysis/')))
-from extract_dataframe import read_json
 from extract_dataframe import TweetDfExtractor
-
+from extract_dataframe import read_json
 _, tweet_list = read_json("data/Economic_Twitter_Data.json")
 
 
@@ -36,8 +37,8 @@ class TestTweetDfExtractor(unittest.TestCase):
                          40, 40, 40, 40, 40])
 
     def test_find_full_text(self):
-        text = ['RT @nikitheblogger: Irre: Annalena Baerbock sagt, es bricht ihr das Herz, dass man nicht bedingungslos schwere Waffen liefert.\nMir bricht e…', 'RT @sagt_mit: Merkel schaffte es in 1 Jahr 1 Million "Flüchtlinge" durchzufüttern, jedoch nicht nach 16 Jahren 1 Million Rentner aus der Ar…',
-                'RT @Kryptonoun: @WRi007 Pharma in Lebensmitteln, Trinkwasser, in der Luft oder in der Zahnpasta irgendwo muss ein Beruhigungsmittel bzw. Be…', 'RT @WRi007: Die #Deutschen sind ein braves Volk!. Mit #Spritpreisen von 2 Euro abgefunden. Mit #inflation abgefunden. Mit höheren #Abgaben…', 'RT @RolandTichy: Baerbock verkündet mal so nebenhin in Riga das Ende der Energieimporte aus Russland. Habeck rudert schon zurück, Scholz sc…']
+        text = ['RT @nikitheblogger: Irre: Annalena Baerbock sagt  es bricht ihr das Herz  dass man nicht bedingungslos schwere Waffen liefert.\nMir bricht e…', 'RT @sagt_mit: Merkel schaffte es in 1 Jahr 1 Million "Flüchtlinge" durchzufüttern  jedoch nicht nach 16 Jahren 1 Million Rentner aus der Ar…',
+                'RT @Kryptonoun: @WRi007 Pharma in Lebensmitteln  Trinkwasser  in der Luft oder in der Zahnpasta irgendwo muss ein Beruhigungsmittel bzw. Be…', 'RT @WRi007: Die #Deutschen sind ein braves Volk!. Mit #Spritpreisen von 2 Euro abgefunden. Mit #inflation abgefunden. Mit höheren #Abgaben…', 'RT @RolandTichy: Baerbock verkündet mal so nebenhin in Riga das Ende der Energieimporte aus Russland. Habeck rudert schon zurück  Scholz sc…']
 
         self.assertEqual(self.df.find_full_text(), text)
 
@@ -81,12 +82,12 @@ class TestTweetDfExtractor(unittest.TestCase):
         self.assertEqual(self.df.find_retweet_count(), [355, 505, 4, 332, 386])
 
     def test_find_hashtags(self):
-        self.assertEqual(self.df.find_hashtags(), [[], [], [], [
-                         'Deutschen', 'Spritpreisen', 'inflation', 'Abgaben'], []])
+        self.assertEqual(self.df.find_hashtags(), [
+                         '', '', '', 'Deutschen___Spritpreisen___inflation___Abgaben___', ''])
 
     def test_find_mentions(self):
-        self.assertEqual(self.df.find_mentions(), [['nikitheblogger'], ['sagt_mit'], [
-                         'Kryptonoun', 'WRi007'], ['WRi007'], ['RolandTichy']])
+        self.assertEqual(self.df.find_mentions(), [
+                         'nikitheblogger___', 'sagt_mit___', 'Kryptonoun___WRi007___', 'WRi007___', 'RolandTichy___'])
 
     def test_find_location(self):
         self.assertEqual(self.df.find_location(), ['', '', '', '', ''])

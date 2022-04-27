@@ -43,7 +43,7 @@ class TweetDfExtractor:
 
     def find_full_text(self) -> list:
 
-        text = [tweet['text'] for tweet in self.tweets_list]
+        text = [tweet['text'].replace(',', ' ') for tweet in self.tweets_list]
         return text
 
     def find_sentiments(self, text) -> list:
@@ -70,7 +70,7 @@ class TweetDfExtractor:
 
     def find_screen_name(self) -> list:
 
-        screen_name = [tweet['user']['screen_name']
+        screen_name = [tweet['user']['screen_name'].replace(',', ' ')
                        for tweet in self.tweets_list]
         return screen_name
 
@@ -109,8 +109,11 @@ class TweetDfExtractor:
         # or if only hashtag text is needed
         hashtags = []
         for tweet in self.tweets_list:
-            hashtags.append([hashtag['text']
-                            for hashtag in tweet['entities']['hashtags']])
+            values = ""
+            for hashtag in tweet['entities']['hashtags']:
+                if hashtag['text'] != "" or hashtag['text'] != " ":
+                    values = values + hashtag['text'].replace(',', ' ') + "___"
+            hashtags.append(values)
         return hashtags
 
     def find_mentions(self) -> list:
@@ -119,8 +122,12 @@ class TweetDfExtractor:
         # or if only user mention  screen name or name  is needed
         mentions = []
         for tweet in self.tweets_list:
-            mentions.append([user_mentions['screen_name']
-                             for user_mentions in tweet['entities']['user_mentions']])
+            values = ""
+            for user_mentions in tweet['entities']['user_mentions']:
+                if user_mentions['screen_name'] != "" or user_mentions['screen_name'] != " ":
+                    values = values + \
+                        user_mentions['screen_name'].replace(',', ' ') + "___"
+            mentions.append(values)
         return mentions
 
     def find_location(self) -> list:
@@ -132,6 +139,12 @@ class TweetDfExtractor:
             location = []
 
         return location
+
+    def find_lang(self) -> list:
+
+        lang = [tweet['lang'] for tweet in self.tweets_list]
+
+        return lang
 
     def get_tweet_df(self, save=False) -> pd.DataFrame:
         """required column to be generated you should be creative and add more features"""
@@ -158,7 +171,7 @@ class TweetDfExtractor:
         df = pd.DataFrame(data=data, columns=columns)
 
         if save:
-            df.to_csv('processed_tweet_data.csv', index=False)
+            df.to_csv('data/processed_tweet_data.csv', index=False)
             print('File Successfully Saved.!!!')
 
         return df
@@ -168,7 +181,7 @@ if __name__ == "__main__":
     # required column to be generated you should be creative and add more features
     columns = ['created_at', 'source', 'original_text', 'clean_text', 'sentiment', 'polarity', 'subjectivity', 'lang', 'favorite_count', 'retweet_count',
                'original_author', 'screen_count', 'followers_count', 'friends_count', 'possibly_sensitive', 'hashtags', 'user_mentions', 'place', 'place_coord_boundaries']
-    _, tweet_list = read_json("/data/Economic_Twitter_Data.json")
+    _, tweet_list = read_json("data/Economic_Twitter_Data.json")
     tweet = TweetDfExtractor(tweet_list)
     tweet_df = tweet.get_tweet_df()
 
