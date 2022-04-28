@@ -1,5 +1,6 @@
 import json
 import pandas as pd
+import re
 from textblob import TextBlob
 
 
@@ -50,12 +51,20 @@ class TweetDfExtractor:
 
         polarity = []
         subjectivity = []
+        sentiment = []
+        xo = True
         for t in text:
-            sentiment = TextBlob(t).sentiment
-            polarity.append(sentiment.polarity)
-            subjectivity.append(sentiment.subjectivity)
+            each_sentiment = TextBlob(t).sentiment
+            polarity.append(each_sentiment.polarity)
+            subjectivity.append(each_sentiment.subjectivity)
+            if each_sentiment.polarity > 0:
+                sentiment.append("positive")
+            elif each_sentiment.polarity < 0:
+                sentiment.append("negative")
+            else:
+                sentiment.append("neutral")
         self.subjectivity = subjectivity
-        return polarity, self.subjectivity
+        return polarity, self.subjectivity, sentiment
 
     def find_created_time(self) -> list:
 
@@ -113,6 +122,8 @@ class TweetDfExtractor:
             for hashtag in tweet['entities']['hashtags']:
                 if hashtag['text'] != "" or hashtag['text'] != " ":
                     values = values + hashtag['text'].replace(',', ' ') + "___"
+            if values == "":
+                values = " "
             hashtags.append(values)
         return hashtags
 
@@ -127,14 +138,16 @@ class TweetDfExtractor:
                 if user_mentions['screen_name'] != "" or user_mentions['screen_name'] != " ":
                     values = values + \
                         user_mentions['screen_name'].replace(',', ' ') + "___"
+            if values == "":
+                values = " "
             mentions.append(values)
         return mentions
 
     def find_location(self) -> list:
 
         try:
-            location = [tweet['user']['location']
-                        for tweet in self.tweets_list]
+            location = [tweet['user']['location'] if tweet['user']
+                        ['location'] != "" else None for tweet in self.tweets_list]
         except TypeError:
             location = []
 
@@ -146,16 +159,23 @@ class TweetDfExtractor:
 
         return lang
 
+    def find_clean_text(self) -> list:
+        clean_text = [re.sub("[^a-zA-Z0-9#@\s’,_]", "", text)
+                      for text in self.find_full_text()]
+        clean_text = [re.sub("\s+", " ", text) for text in clean_text]
+        return clean_text
+
     def get_tweet_df(self, save=False) -> pd.DataFrame:
         """required column to be generated you should be creative and add more features"""
 
-        columns = ['created_at', 'source', 'original_text', 'polarity', 'subjectivity', 'lang', 'favorite_count', 'retweet_count',
+        columns = ['created_at', 'source', 'original_text', 'clean_text', 'polarity', 'subjectivity', 'sentiment', 'lang', 'favorite_count', 'retweet_count',
                    'original_author', 'followers_count', 'friends_count', 'possibly_sensitive', 'hashtags', 'user_mentions', 'place']
 
         created_at = self.find_created_time()
         source = self.find_source()
         text = self.find_full_text()
-        polarity, subjectivity = self.find_sentiments(text)
+        clean_text = self.find_clean_text()
+        polarity, subjectivity, sentiment = self.find_sentiments(text)
         lang = self.find_lang()
         fav_count = self.find_favourite_count()
         retweet_count = self.find_retweet_count()
@@ -166,7 +186,7 @@ class TweetDfExtractor:
         hashtags = self.find_hashtags()
         mentions = self.find_mentions()
         location = self.find_location()
-        data = zip(created_at, source, text, polarity, subjectivity, lang, fav_count, retweet_count,
+        data = zip(created_at, source, text, clean_text, polarity, subjectivity, sentiment, lang, fav_count, retweet_count,
                    screen_name, follower_count, friends_count, sensitivity, hashtags, mentions, location)
         df = pd.DataFrame(data=data, columns=columns)
 

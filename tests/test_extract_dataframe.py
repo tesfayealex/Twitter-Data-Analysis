@@ -44,7 +44,7 @@ class TestTweetDfExtractor(unittest.TestCase):
 
     def test_find_sentiments(self):
         self.assertEqual(self.df.find_sentiments(self.df.find_full_text()), ([
-                         0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0]))
+                         0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0, 0.0],['neutral', 'neutral', 'neutral', 'neutral', 'neutral']))
 
     def test_find_created_time(self):
         created_at = ['Fri Apr 22 22:20:18 +0000 2022', 'Fri Apr 22 22:19:16 +0000 2022',
